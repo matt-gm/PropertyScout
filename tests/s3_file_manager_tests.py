@@ -1,6 +1,7 @@
 import unittest
 import os
 import sys
+sys.path.insert(0, '../data-ingestion/utilities')
 import s3_file_manager
 
 class s3_file_manager_tests(unittest.TestCase):

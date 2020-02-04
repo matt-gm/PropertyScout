@@ -1,24 +1,27 @@
-# csv_to_parquet.py
+'''
+Convert and CSV to Apache Parquet
+Requires format .ini file
+'''
+import sys
+from pyarrow.csv import read_csv
 
-import pandas as pd
-import pyarrow as pa
-import pyarrow.parquet as pq
+def city_csv_to_parqut(city, file_source, file_destination):
+    df = read_csv(input_file=file_source)
 
-csv_file = '/Users/matthewmaatubang/Downloads/Assessor_Parcels_Data_-_2019.csv'
-parquet_file = '/Users/matthewmaatubang/Downloads/la_2019.parquet'
-chunksize = 100_000
 
-csv_stream = pd.read_csv(csv_file, sep='\t', chunksize=chunksize, low_memory=False)
+if __name__ == "__main__":
 
-for i, chunk in enumerate(csv_stream):
-    print("Chunk", i)
-    if i == 0:
-        # Guess the schema of the CSV file from the first chunk
-        parquet_schema = pa.Table.from_pandas(df=chunk).schema
-        # Open a Parquet file for writing
-        parquet_writer = pq.ParquetWriter(parquet_file, parquet_schema, compression='snappy')
-    # Write CSV chunk to the parquet file
-    table = pa.Table.from_pandas(chunk, schema=parquet_schema)
-    parquet_writer.write_table(table)
+    FILE_SOURCE = str(sys.argv[1])
+    FILE_DESTINATION = str(sys.argv[2])
 
-parquet_writer.close()
+    DF = read_csv(input_file=FILE_SOURCE)
+    COLUMNS_TO_DROP = ['ZIPcode', "AIN", "AssessorID", "PropertyLocation",
+                       "SpecificUseDetail1", "SpecificUseDetail2", "totBuildingDataLines",
+                       "YearBuilt", "Units", "RecordingDate", "HomeownersExemption",
+                       "RealEstateExemption", "FixtureValue", "FixtureExemption",
+                       "PersonalPropertyValue", "PersonalPropertyExemption", "isTaxableParcel?",
+                       "netTaxableValue", "TotalExemption", "SpecialParcelClassification",
+                       "AdministrativeRegion", "ParcelBoundaryDescription", "HouseFraction",
+                       "StreetDirection", "UnitNo", "City", "rowID", "Location 1"]
+    DF = DF.drop(*COLUMNS_TO_DROP)
+    DF.write.parquet(FILE_DESTINATION)

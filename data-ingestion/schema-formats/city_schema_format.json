@@ -1,0 +1,58 @@
+{
+  "Los Angeles": {
+    "address_number": "AN",
+    "street": "S",
+    "city": "C",
+    "ZIP_code": "ZC",
+    "state": "CA",
+    "year": "Y"
+  }
+  "San Francisco": {
+    "address_number": ,
+    "street": ,
+    "city": ,
+    "ZIP_code": ,
+    "state": "CA",
+    "year": ""
+  }
+  "New York City": {
+    "address_number": ,
+    "street": ,
+    "city": ,
+    "ZIP_code": ,
+    "state": "NY",
+    "year": ""
+  }
+  "Austin": {
+    "address_number": ,
+    "street": ,
+    "city": ,
+    "ZIP_code": ,
+    "state": "TX",
+    "year": ""
+  }
+  "Houston": {
+    "address_number": ,
+    "street": ,
+    "city": ,
+    "ZIP_code": ,
+    "state": "TX",
+    "year": ""
+  }
+  "Houston": {
+    "address_number": ,
+    "street": ,
+    "city": ,
+    "ZIP_code": ,
+    "state": "TX",
+    "year": ""
+  }
+  "Houston": {
+    "address_number": ,
+    "street": ,
+    "city": ,
+    "ZIP_code": ,
+    "state": "TX",
+    "year": ""
+  }
+}

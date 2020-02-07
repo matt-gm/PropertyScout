@@ -8,40 +8,18 @@ class _aggregation_tuple():
     def __init__(self):
         self.sum_land_value = 0
         self.sum_improvements_value = 0
-        self.residential_count = 0
-        self.industrial_count = 0
-        self.commercial_count = 0
-        self.vacant_count = 0
-        self.other_count = 0
-        return self
+        self.property_count = 0
+        self.property_classes = defaultdict(list)
 
     def increment_count(self, use_case):
-        if use_case == "RESIDENTIAL":
-            self.residential_count += 1
-        elif use_case == "INDUSTRIAL":
-            self.industrial_count += 1
-        elif use_case == "COMMERCIAL":
-            self.commercial_count += 1
-        elif use_case == "VACANT":
-            self.vacant_count += 1
-        else:
-            self.other_count += 1
+        self.property_count += 1
+        self.property_classes[use_case] += 1
 
     def add_to_value(self, land_value, improvements_value):
         self.sum_land_value += land_value
         self.sum_improvements_value += improvements_value
 
-    def __repr__(self):
-        count = self.residential_count + self.industrial_count \
-            + self.commercial_count + self.vacant_count + self.other_count
-        return {
-            'avg_land_value': self.sum_land_value/count,
-            'avg_improvements_value': self.sum_improvements_value/count,
-            'residential_count': self.residential_count,
-            'industrial_count': self.industrial_count,
-            'commercial_count': self.commercial_count,
-            'vacant_count': self.vacant_count,
-            'other_count': self.other_count}
+
 
 
 def aggregation_by_city_zip_street(source_name, source_parquet):

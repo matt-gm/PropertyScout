@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 
 .DS_Store
+
+LA_data.csv
+la_data_new.csv

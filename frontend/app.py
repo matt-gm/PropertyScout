@@ -10,7 +10,7 @@ app = dash.Dash(__name__)
 app.config.suppress_callback_exceptions = True
 
 
-la_data = pd.read_csv('LA_data.csv')
+la_data = pd.read_csv('la_data_new.csv')
 cd = la_data
 selectable_cities = cd.city.unique()
 selectable_neighborhoods = cd.neighborhood.unique()
@@ -36,7 +36,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='city-dropdown',
                 options=[{'label': i, 'value': i} for i in selectable_cities],
-                value='Begin typing here...'
+                value=selectable_cities
             )
         ],
         style={'width': '33%', 'display': 'inline-block'}),
@@ -46,7 +46,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='neighborhood-dropdown',
                 options=[{'label': i, 'value': i} for i in selectable_neighborhoods],
-                value='Begin typing here...'
+                value=selectable_neighborhoods
             )],
             style={'width': '33%', 'display': 'inline-block'}
         ),
@@ -56,7 +56,7 @@ app.layout = html.Div([
             dcc.Dropdown(
                 id='street-dropdown',
                 options=[{'label': i, 'value': i} for i in selectable_streets],
-                value='Begin typing here...'
+                value=selectable_streets
             )
         ],
         style={'width': '33%', 'display': 'inline-block'}),
@@ -97,6 +97,10 @@ def create_time_series(dff, title):
         }
     }
 
+def create_bar_chart(dff, title):
+    return True
+
+
 @app.callback(
     Output('assessor-values-over-time-series', 'figure'),
     [Input('city-dropdown', 'value'),
@@ -104,10 +108,19 @@ def create_time_series(dff, title):
      Input('street-dropdown', 'value')])
 def update_scatter(city, neighborhood, street):
     selected_data = cd
-    selected_data = selected_data.loc[str(selected_data['city']) == str(city)]
-    selected_data = selected_data.loc[str(selected_data['neighborhood']) == str(neighborhood)]
-    selected_data = selected_data.loc[str(selected_data['street']) == str(street)]
+    title_str = "Los Angeles Assessed Value"
+    if isSelected(city):
+        selected_data = selected_data.loc[selected_data['city'] == city]
+        title_str += " in " + city
+    if isSelected(neighborhood):
+        selected_data = selected_data.loc[selected_data['neighborhood'] == neighborhood]
+        title_str += " in " + str(neighborhood)
+    if isSelected(street):
+        selected_data = selected_data.loc[selected_data['street'] == street]
+        title_str += " on " + street
 
+    if selected_data.empty:
+        title_str = "No matching data."
 
     print("selected_data shape is : " + str(selected_data.shape))
 
@@ -118,10 +131,16 @@ def update_scatter(city, neighborhood, street):
 
     grouped = selected_data.groupby(
                     ["year"]).agg(function_dict).reset_index()
-    print("grouped shape is : " + str(grouped.shape))
-    print(list(grouped))
+    #grouped = selected_data.groupby(
+    #                   ["use"]).agg(function_dict).reset_index()
+    #print("grouped shape is : " + str(grouped.shape))
+    #print(list(grouped))
 
-    return create_time_series(grouped, "Assessor Value over Time")
+
+    return create_time_series(grouped, title_str)
+
+def isSelected(in_val):
+    return not isinstance(in_val, list) and (in_val is not None)
 
 if __name__ == '__main__':
     app.run_server(debug=True)

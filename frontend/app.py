@@ -23,7 +23,8 @@ cities = ["Los Angeles", "San Francisco", "New York City", "Denver",
 
 # Main App
 app.layout = html.Div([
-    html.H1("PropertyScout", style={"textAlign": "center"}),
+    html.Img("assets/PS_logo.png")
+    html.H4("1 stop real estate record resource", style={"textAlign": "center"}),
 
     html.Div([
         html.Div([
@@ -172,7 +173,7 @@ def create_bar_chart(dff, title):
             },
             'yaxis': {
                 'title': "Average Improvement Value in USD",
-                'tickprefix':"$"
+                'tickprefix': "$"
             },
             'annotations': [{
                 'y': 1, 'x': 0.5, 'xanchor': 'center', 'yanchor': 'bottom',

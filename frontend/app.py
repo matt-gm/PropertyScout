@@ -27,9 +27,7 @@ app.layout = html.Div([
         html.Img(src=app.get_asset_url('PS_logo.png'),
                  style={"align": "center", "height": "150px",
                    "display": "block", "margin-left": "auto",
-                   "margin-right": "auto", "width": "auto", "height": "300px"}),
-        html.H4("1 stop real estate record resource",
-                style={"textAlign": "center"}),
+                   "margin-right": "auto", "width": "auto", "height": "300px"})
     ]),
 
     html.Div([

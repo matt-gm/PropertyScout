@@ -23,8 +23,12 @@ cities = ["Los Angeles", "San Francisco", "New York City", "Denver",
 
 # Main App
 app.layout = html.Div([
-    html.Img(src=app.get_asset_url('PS_Logo.png')),
-    html.H4("1 stop real estate record resource", style={"textAlign": "center"}),
+    html.Div([
+        html.Img(src=app.get_asset_url('PS_Logo.png'),
+                 style={"align": "center"}),
+        html.H4("1 stop real estate record resource",
+                style={"textAlign": "center"}),
+    ]),
 
     html.Div([
         html.Div([

@@ -5,6 +5,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import pandas as pd
 import numpy as np
+import concurrent.futures
 from jitcache import Cache
 
 cache = Cache()
@@ -18,6 +19,7 @@ selectable_cities = cd.city.unique()
 selectable_neighborhoods = cd.neighborhood.unique()
 selectable_streets = cd.street.unique()
 selectable_use = cd.use.unique()
+selected_data = cd
 cities = ["Los Angeles", "San Francisco", "New York City", "Denver",
           "Las Vegas", "Austin"]
 
@@ -193,7 +195,10 @@ def create_bar_chart(dff, title):
 @app.callback(
     [Output('assessor-values-over-time-series', 'figure'),
      Output('assessor-count-by-type-pie', 'figure'),
-     Output('assessor-improvment-value-by-type', 'figure')],
+     Output('assessor-improvment-value-by-type', 'figure'),
+     Output('city-dropdown', 'options'),
+     Output('neighborhood-dropdown', 'options'),
+     Output('street-dropdown', 'options')],
     [Input('city-dropdown', 'value'),
      Input('neighborhood-dropdown', 'value'),
      Input('street-dropdown', 'value'),
@@ -204,6 +209,9 @@ def update_chart(city, neighborhood, street, years, uses):
     selected_data = cd.loc[(cd['year'] >= min(years)) &
                            (cd['year'] <= max(years))]
     selected_data = selected_data.loc[selected_data['use'].isin(uses)]
+    city_ops = selectable_cities
+    neighborhood_ops = selectable_neighborhoods
+    street_ops = selectable_streets
 
     title_str = "LA County Assessor Value"
     chart_str = "Property Use Percentage in LA County"
@@ -233,12 +241,15 @@ def update_chart(city, neighborhood, street, years, uses):
         title_str += " on " + street_name
         chart_str += " on " + street_name
         bar_str += " on " + street_name
-    if selected_data.empty:
-        title_str = "Selection does not exist."
-        chart_str = "Selection does not exist."
-        bar_str = "Selection does not exist."
-        pass
 
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        city_ops = executor.submit(selected_data.city.unique)
+        neighborhood_ops = executor.submit(selected_data.neighborhood.unique)
+        street_ops = executor.submit(selected_data.street.unique)
+
+    #city_ops = selected_data.city.unique()
+    #neighborhood_ops = selected_data.neighborhood.unique()
+    #street_ops = selected_data.street.unique()
     weighted_mean = lambda x: np.average(x, weights=selected_data.loc[x.index,
                                                                       "count"])
     function_dict = {'count': np.sum,
@@ -256,10 +267,21 @@ def update_chart(city, neighborhood, street, years, uses):
     chart_str += " in Year " + str(latest_year)
     bar_str += " in Year " + str(latest_year)
 
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        city_ops = city_ops.result()
+        neighborhood_ops = neighborhood_ops.result()
+        street_ops = street_ops.result()
+
     return (create_time_series(year_group, title_str),
             create_pie_chart(use_group, chart_str),
-            create_bar_chart(use_group, bar_str))
+            create_bar_chart(use_group, bar_str),
+            update_options(city_ops),
+            update_options(neighborhood_ops),
+            update_options(street_ops))
 
+
+def update_options(opts):
+    return [{'label': i, 'value': i} for i in opts]
 
 
 if __name__ == '__main__':

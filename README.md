@@ -1,6 +1,6 @@
 # Property Scout  
 
-###1-stop real estate record resource.
+### 1-stop real estate record resource.
 ![PropertyScout_Screenshot.png](frontend/assets/PS_logo.png)
 
 ## Pipeline

@@ -1,18 +1,19 @@
+"""Property Scout Dash - Created by Matthew Maatubang."""
+
+import concurrent.futures
 import dash
-import dash_table as dt
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output
 import pandas as pd
 import numpy as np
-import concurrent.futures
 from jitcache import Cache
+
 
 cache = Cache()
 app = dash.Dash(__name__)
-app.config.suppress_callback_exceptions = True
 
-# Global Vaiables to control what data is stored
+
 LA_DATA = pd.read_parquet('LA_2006_2019.parquet')
 cd = LA_DATA
 selectable_cities = cd.city.unique()
@@ -23,7 +24,7 @@ selected_data = cd
 cities = ["Los Angeles", "San Francisco", "New York City", "Denver",
           "Las Vegas", "Austin"]
 
-# Main App
+
 app.layout = html.Div([
     html.Div([
         html.Img(src=app.get_asset_url('PS_logo.png'),
@@ -102,6 +103,7 @@ app.layout = html.Div([
 
 
 def create_time_series(dff, title):
+    """Return dict inputs for plotly time series figure."""
     return {
         'data': [dict(
             x=dff['year'].unique(),
@@ -144,6 +146,7 @@ def create_time_series(dff, title):
 
 
 def create_pie_chart(dff, title):
+    """Return dict inputs for plotly pie chart figure."""
     return {
         'data': [dict(
             type="pie",
@@ -165,6 +168,7 @@ def create_pie_chart(dff, title):
 
 
 def create_bar_chart(dff, title):
+    """Return dict inputs for plotly bar chart figure."""
     return {
         'data': [dict(
             type="bar",
@@ -206,6 +210,7 @@ def create_bar_chart(dff, title):
      Input('uses-checkbox', 'value')])
 @cache.memoize
 def update_chart(city, neighborhood, street, years, uses):
+    """Update all interactive elements for the dashboard."""
     selected_data = cd.loc[(cd['year'] >= min(years)) &
                            (cd['year'] <= max(years))]
     selected_data = selected_data.loc[selected_data['use'].isin(uses)]
@@ -213,17 +218,17 @@ def update_chart(city, neighborhood, street, years, uses):
     neighborhood_ops = selectable_neighborhoods
     street_ops = selectable_streets
 
-    title_str = "LA County Assessor Value"
+    title_str = "LA County Assessed Real Estate Value"
     chart_str = "Property Use Percentage in LA County"
-    bar_str = "Average Improvement Value in LA County"
+    bar_str = "Average Assessed Improvement Value in LA County"
     if city:
         if not isinstance(city, list):
             city = list(city)
         selected_data = selected_data.loc[selected_data['city'].isin(city)]
         city_name = ','.join(city)
-        title_str = city_name + " Assessor Value"
+        title_str = city_name + " Assessed Real Estate Value"
         chart_str = city_name + " Property Use Percentage"
-        bar_str = city_name + " Average Improvement Value"
+        bar_str = city_name + " Average Assessed Improvement Value"
     if neighborhood:
         if not isinstance(neighborhood, list):
             neighborhood = list(neighborhood)
@@ -247,9 +252,6 @@ def update_chart(city, neighborhood, street, years, uses):
         neighborhood_ops = executor.submit(selected_data.neighborhood.unique)
         street_ops = executor.submit(selected_data.street.unique)
 
-    #city_ops = selected_data.city.unique()
-    #neighborhood_ops = selected_data.neighborhood.unique()
-    #street_ops = selected_data.street.unique()
     weighted_mean = lambda x: np.average(x, weights=selected_data.loc[x.index,
                                                                       "count"])
     function_dict = {'count': np.sum,
@@ -281,6 +283,7 @@ def update_chart(city, neighborhood, street, years, uses):
 
 
 def update_options(opts):
+    """Helper function, returns dict for selectable options."""
     return [{'label': i, 'value': i} for i in opts]
 
 
